@@ -7,7 +7,7 @@ import (
 )
 
 type weightTypes interface {
-	~float64 | ~float32 | ~int | ~int8 | ~int16 | ~int32 | ~int64
+	~float32 | ~float64 | ~int | ~int8 | ~int16 | ~int32 | ~int64
 }
 
 type wRand[T weightTypes] struct {
@@ -16,6 +16,21 @@ type wRand[T weightTypes] struct {
 }
 
 func NewWRand[T weightTypes](items []interface{}, weights []T) *wRand[T] {
+	return &wRand[T]{
+		items:   items,
+		weights: weights,
+	}
+}
+
+func NewWRandByMap[T weightTypes](m map[interface{}]T) *wRand[T] {
+	var items []interface{}
+	var weights []T
+
+	for item, weight := range m {
+		items = append(items, item)
+		weights = append(weights, weight)
+	}
+
 	return &wRand[T]{
 		items:   items,
 		weights: weights,
@@ -35,6 +50,7 @@ func (wR *wRand[T]) GetN(n int) []interface{} {
 	var items []interface{}
 	var wg sync.WaitGroup
 	var mutex sync.RWMutex
+
 	wg.Add(n)
 	for i := 0; i < n; i++ {
 		go func() {
