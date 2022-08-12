@@ -48,7 +48,12 @@ func NewWRandByObject[T weightTypes](fieldName string, objects []interface{}) (*
 		if !f.IsValid() {
 			return nil, fmt.Errorf("field %s does not exist in object %v", fieldName, object)
 		}
-		weights = append(weights, T(f.Kind()))
+		switch f.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			weights = append(weights, T(f.Int()))
+		case reflect.Float32, reflect.Float64:
+			weights = append(weights, T(f.Float()))
+		}
 	}
 
 	return &wRand[T]{
@@ -60,7 +65,6 @@ func NewWRandByObject[T weightTypes](fieldName string, objects []interface{}) (*
 
 func (wR *wRand[T]) GetOne() interface{} {
 	cumulativeWeights := cumulativeWeights(wR)
-
 	rand.Seed(time.Now().UnixNano())
 	randNum := rand.Float64() * float64(cumulativeWeights[len(cumulativeWeights)-1])
 
@@ -86,6 +90,7 @@ func (wR *wRand[T]) GetN(n int) []interface{} {
 	return items
 }
 func (wR *wRand[T]) PopN(n int) ([]interface{}, error) {
+	fmt.Println(wR.weights)
 	if n > len(wR.items) {
 		return nil, fmt.Errorf("can't pop %d items from an slice with size of %d", n, len(wR.items))
 	}
