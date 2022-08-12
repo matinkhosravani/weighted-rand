@@ -57,4 +57,16 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println(wRObj.GetN(5))
+
+	//items to pick
+	items = []interface{}{"one", "two", "four", "eight", "ten"}
+	weightsPop := []int{1, 2, 4, 8, 5}
+	wRPop := weightedRand.NewWRand(items, weightsPop)
+	item, err := wRPop.PopN(1)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(item)
+
 }

@@ -85,6 +85,24 @@ func (wR *wRand[T]) GetN(n int) []interface{} {
 
 	return items
 }
+func (wR *wRand[T]) PopN(n int) ([]interface{}, error) {
+	if n > len(wR.items) {
+		return nil, fmt.Errorf("can't pop %d items from an slice with size of %d", n, len(wR.items))
+	}
+	var items []interface{}
+	for i := 0; i < n; i++ {
+		item := wR.GetOne()
+		for i, other := range wR.items {
+			if other == item {
+				wR.items = append(wR.items[:i], wR.items[i+1:]...)
+				wR.weights = append(wR.weights[:i], wR.weights[i+1:]...)
+			}
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
+}
 
 func matchItem[T weightTypes](cumulativeWeights []T, randNum T, wR *wRand[T]) interface{} {
 	for i, v := range cumulativeWeights {
