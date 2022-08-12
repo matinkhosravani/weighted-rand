@@ -1,7 +1,9 @@
 package weightedRand
 
 import (
+	"fmt"
 	"math/rand"
+	"reflect"
 	"sync"
 	"time"
 )
@@ -35,6 +37,25 @@ func NewWRandByMap[T weightTypes](m map[interface{}]T) *wRand[T] {
 		items:   items,
 		weights: weights,
 	}
+}
+
+func NewWRandByObject[T weightTypes](fieldName string, objects []interface{}) (*wRand[T], error) {
+	var weights []T
+
+	for _, object := range objects {
+		r := reflect.ValueOf(object)
+		f := reflect.Indirect(r).FieldByName(fieldName)
+		if !f.IsValid() {
+			return nil, fmt.Errorf("field %s does not exist in object %v", fieldName, object)
+		}
+		weights = append(weights, T(f.Kind()))
+	}
+
+	return &wRand[T]{
+			items:   objects,
+			weights: weights,
+		},
+		nil
 }
 
 func (wR *wRand[T]) GetOne() interface{} {

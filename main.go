@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"weightedRand/weightedRand"
 )
 
@@ -27,4 +28,33 @@ func main() {
 	}
 	wRMap := weightedRand.NewWRandByMap(m)
 	fmt.Println(wRMap.GetN(5))
+
+	type miniAd struct {
+		id     int
+		weight int
+	}
+	miniAds := []miniAd{
+		{
+			id:     1,
+			weight: 1,
+		},
+		{
+			id:     2,
+			weight: 2,
+		},
+		{
+			id:     3,
+			weight: 3,
+		},
+	}
+	var objs []interface{}
+	for _, miniAd := range miniAds {
+		objs = append(objs, miniAd)
+	}
+	wRObj, err := weightedRand.NewWRandByObject[float64]("weight", objs)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(wRObj.GetN(5))
 }
