@@ -3,7 +3,6 @@ package weightedRand
 import (
 	"fmt"
 	"math/rand"
-	"sync"
 	"time"
 )
 
@@ -17,19 +16,17 @@ func (wR *WRand[T]) GetOne() interface{} {
 
 func (wR *WRand[T]) GetN(n int) []interface{} {
 	var items []interface{}
-	var wg sync.WaitGroup
-	var mutex sync.RWMutex
 
-	wg.Add(n)
+	itemsChannel := make(chan interface{})
+
 	for i := 0; i < n; i++ {
 		go func() {
-			defer wg.Done()
-			mutex.Lock()
-			items = append(items, wR.GetOne())
-			mutex.Unlock()
+			itemsChannel <- wR.GetOne()
 		}()
 	}
-	wg.Wait()
+	for i := 0; i < n; i++ {
+		items = append(items, <-itemsChannel)
+	}
 
 	return items
 }
