@@ -1,4 +1,4 @@
-package weightedRand
+package weighted_random
 
 import "testing"
 

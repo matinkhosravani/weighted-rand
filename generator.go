@@ -1,4 +1,4 @@
-package weightedRand
+package weighted_rand
 
 import (
 	"fmt"
@@ -10,14 +10,16 @@ type weightTypes interface {
 }
 
 type WRand[T weightTypes] struct {
-	items   []interface{}
-	weights []T
+	items             []interface{}
+	weights           []T
+	cumulativeWeights []T
 }
 
 func NewWRand[T weightTypes](items []interface{}, weights []T) *WRand[T] {
 	return &WRand[T]{
-		items:   items,
-		weights: weights,
+		items:             items,
+		weights:           weights,
+		cumulativeWeights: cumulativeWeights(items, weights),
 	}
 }
 
@@ -30,10 +32,7 @@ func NewWRandByMap[T weightTypes](m map[interface{}]T) *WRand[T] {
 		weights = append(weights, weight)
 	}
 
-	return &WRand[T]{
-		items:   items,
-		weights: weights,
-	}
+	return NewWRand(items, weights)
 }
 
 func NewWRandByObject[T weightTypes](fieldName string, objects []interface{}) (*WRand[T], error) {
@@ -53,9 +52,19 @@ func NewWRandByObject[T weightTypes](fieldName string, objects []interface{}) (*
 		}
 	}
 
-	return &WRand[T]{
-			items:   objects,
-			weights: weights,
-		},
-		nil
+	return NewWRand(objects, weights), nil
+}
+
+// example : weights := [1,2,3,4]
+// cWeights : [1,3,6,10]
+func cumulativeWeights[T weightTypes](items []interface{}, weights []T) []T {
+	cWeights := make([]T, len(items))
+	for i, v := range weights {
+		if i == 0 {
+			cWeights[i] = v
+		} else {
+			cWeights[i] = v + cWeights[i-1]
+		}
+	}
+	return cWeights
 }
