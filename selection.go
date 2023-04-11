@@ -1,4 +1,4 @@
-package weighted_random
+package weighted_rand
 
 import (
 	"fmt"
