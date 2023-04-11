@@ -1,7 +1,6 @@
-package weighted_random
+package weighted_rand
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -36,7 +35,7 @@ func TestPopN(t *testing.T) {
 	wR := NewWRand(copyOfSlice, weights)
 	numIterations := 3
 	results, err := wR.PopN(numIterations)
-	fmt.Println(items)
+
 	if err != nil {
 		t.Errorf("got %v, want %v", err, nil)
 	}
